@@ -1,6 +1,4 @@
-from src.data_collection import collect_multiple_seasons,save_all_seasons
+from src.data_cleaning import clean_and_save_all_seasons
 from configs.config import SEASONS
 
-
-df = collect_multiple_seasons(SEASONS)
-save_all_seasons(df,SEASONS)
+clean_and_save_all_seasons(SEASONS)
