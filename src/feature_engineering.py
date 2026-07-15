@@ -52,6 +52,7 @@ def add_team_form_feature(df: pd.DataFrame, window: int = 5) -> pd.DataFrame:
 
     return df
 
+
 def fill_missing_form(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
@@ -64,3 +65,28 @@ def fill_missing_form(df: pd.DataFrame) -> pd.DataFrame:
     df["RecentFormTeamPosition"] = df["RecentFormTeamPosition"].fillna(overall_avg_position)
 
     return df
+
+def add_circuit_history_feature(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    df = df.sort_values(["Year", "RoundNumber"])
+
+    df["CircuitAvgPosition"] = (
+        df.groupby(["DriverId","EventName"])["Position"]
+        .transform(lambda x: x.shift(1).expanding().mean())
+    )
+        
+    return df
+def fill_missing_form(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+
+    overall_avg_position = df["Position"].mean()
+
+    df["DriverHasHistory"] = df["RecentFormPosition"].notna()
+    df["TeamHasHistory"] = df["RecentFormTeamPosition"].notna()
+    df["CircuitHasHistory"] = df["CircuitAvgPosition"].notna()
+
+    df["RecentFormPosition"] = df["RecentFormPosition"].fillna(overall_avg_position)
+    df["RecentFormTeamPosition"] = df["RecentFormTeamPosition"].fillna(overall_avg_position)
+    df["CircuitAvgPosition"] = df["CircuitAvgPosition"].fillna(overall_avg_position)
+
+    return df   
