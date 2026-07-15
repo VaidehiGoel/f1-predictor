@@ -1,5 +1,5 @@
 import pandas as pd
-
+from configs.config import PROCESSED_DATA_DIR 
 
 def build_race_level_dataset(df: pd.DataFrame) -> pd.DataFrame:
     race_df = df[df["SessionType"] == "R"].copy()
@@ -90,3 +90,15 @@ def fill_missing_form(df: pd.DataFrame) -> pd.DataFrame:
     df["CircuitAvgPosition"] = df["CircuitAvgPosition"].fillna(overall_avg_position)
 
     return df   
+
+def finalize_dataset(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+
+    columns_to_drop = ["SessionType"]
+    df = df.drop(columns=columns_to_drop)
+
+    return df
+def save_final_dataset(df: pd.DataFrame) -> None:
+    file_path = PROCESSED_DATA_DIR / "model_ready_dataset.csv"
+    df.to_csv(file_path, index=False)
+    print(f"Saved final dataset to {file_path}")
