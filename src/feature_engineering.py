@@ -1,5 +1,6 @@
 import pandas as pd
-from configs.config import PROCESSED_DATA_DIR 
+from configs.config import RAW_DATA_DIR, PROCESSED_DATA_DIR
+
 
 def build_race_level_dataset(df: pd.DataFrame) -> pd.DataFrame:
     race_df = df[df["SessionType"] == "R"].copy()
@@ -16,6 +17,13 @@ def build_race_level_dataset(df: pd.DataFrame) -> pd.DataFrame:
 
     return merged
 
+
+def drop_rows_with_missing_target(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    df = df.dropna(subset=["Position"])
+    return df
+
+
 def add_recent_form_feature(df: pd.DataFrame, window: int = 5) -> pd.DataFrame:
     df = df.copy()
     df = df.sort_values(["Year", "RoundNumber"])
@@ -26,6 +34,7 @@ def add_recent_form_feature(df: pd.DataFrame, window: int = 5) -> pd.DataFrame:
     )
 
     return df
+
 
 def add_team_form_feature(df: pd.DataFrame, window: int = 5) -> pd.DataFrame:
     df = df.copy()
@@ -53,29 +62,34 @@ def add_team_form_feature(df: pd.DataFrame, window: int = 5) -> pd.DataFrame:
     return df
 
 
-def fill_missing_form(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.copy()
-
-    overall_avg_position = df["Position"].mean()
-
-    df["DriverHasHistory"] = df["RecentFormPosition"].notna()
-    df["TeamHasHistory"] = df["RecentFormTeamPosition"].notna()
-
-    df["RecentFormPosition"] = df["RecentFormPosition"].fillna(overall_avg_position)
-    df["RecentFormTeamPosition"] = df["RecentFormTeamPosition"].fillna(overall_avg_position)
-
-    return df
-
 def add_circuit_history_feature(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df = df.sort_values(["Year", "RoundNumber"])
 
     df["CircuitAvgPosition"] = (
-        df.groupby(["DriverId","EventName"])["Position"]
+        df.groupby(["DriverId", "EventName"])["Position"]
         .transform(lambda x: x.shift(1).expanding().mean())
     )
-        
+
     return df
+
+
+def add_qualifying_flags(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+
+    df["ReachedQ2"] = df["Q2_seconds"].notna()
+    df["ReachedQ3"] = df["Q3_seconds"].notna()
+
+    max_q1 = df["Q1_seconds"].max()
+    max_q2 = df["Q2_seconds"].max()
+
+    df["Q1_seconds"] = df["Q1_seconds"].fillna(max_q1)
+    df["Q2_seconds"] = df["Q2_seconds"].fillna(max_q2)
+    df["Q3_seconds"] = df["Q3_seconds"].fillna(max_q2)
+
+    return df
+
+
 def fill_missing_form(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
@@ -89,15 +103,15 @@ def fill_missing_form(df: pd.DataFrame) -> pd.DataFrame:
     df["RecentFormTeamPosition"] = df["RecentFormTeamPosition"].fillna(overall_avg_position)
     df["CircuitAvgPosition"] = df["CircuitAvgPosition"].fillna(overall_avg_position)
 
-    return df   
+    return df
+
 
 def finalize_dataset(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
-
-    columns_to_drop = ["SessionType"]
-    df = df.drop(columns=columns_to_drop)
-
+    df = df.drop(columns=["SessionType"])
     return df
+
+
 def save_final_dataset(df: pd.DataFrame) -> None:
     file_path = PROCESSED_DATA_DIR / "model_ready_dataset.csv"
     df.to_csv(file_path, index=False)
