@@ -37,3 +37,34 @@ print(X_test.shape, y_test.shape)
 
 print(X_train.isna().sum())
 print(X_test.isna().sum())
+
+from sklearn.linear_model import LinearRegression
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+predictions = model.predict(X_test)
+print(predictions[:10])
+print(y_test[:10].values)
+
+from scipy.stats import spearmanr
+
+test_df = test_df.copy()
+test_df["PredictedPosition"] = model.predict(X_test)
+
+def race_spearman(group):
+    correlation, _ = spearmanr(group["PredictedPosition"], group["Position"])
+    return correlation
+
+spearman_by_race = test_df.groupby(["Year", "RoundNumber"]).apply(race_spearman)
+print(spearman_by_race)
+print(f"Mean Spearman correlation across all races: {spearman_by_race.mean():.3f}")
+
+
+test_df2 = test_df[test_df["Status"].isin(["Finished", "Lapped"])]
+
+spearman_by_race_finished = test_df2.groupby(["Year", "RoundNumber"]).apply(race_spearman)
+print(spearman_by_race_finished)
+print(f"Mean Spearman correlation (finished only): {spearman_by_race_finished.mean():.3f}")
+
+finishers_per_race = test_df2.groupby(["Year", "RoundNumber"]).size()
+print(finishers_per_race.sort_values())
