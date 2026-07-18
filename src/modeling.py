@@ -7,7 +7,7 @@ def select_features_and_target(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Serie
         "GridPosition", "Q1_seconds", "Q2_seconds", "Q3_seconds",
         "RecentFormPosition", "RecentFormTeamPosition", "CircuitAvgPosition",
         "DriverHasHistory", "TeamHasHistory", "CircuitHasHistory",
-        "ReachedQ2", "ReachedQ3"
+        "ReachedQ2", "ReachedQ3", "RecentTeammateGap", "RecentTeamDNFRate"
     ]
 
     X = df[feature_columns]

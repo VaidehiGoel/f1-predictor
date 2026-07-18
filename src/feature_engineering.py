@@ -98,13 +98,67 @@ def fill_missing_form(df: pd.DataFrame) -> pd.DataFrame:
     df["DriverHasHistory"] = df["RecentFormPosition"].notna()
     df["TeamHasHistory"] = df["RecentFormTeamPosition"].notna()
     df["CircuitHasHistory"] = df["CircuitAvgPosition"].notna()
+    df["TeammateHistoryExists"] = df["RecentTeammateGap"].notna()
+    df["TeamDNFHistoryExists"] = df["RecentTeamDNFRate"].notna()
 
     df["RecentFormPosition"] = df["RecentFormPosition"].fillna(overall_avg_position)
     df["RecentFormTeamPosition"] = df["RecentFormTeamPosition"].fillna(overall_avg_position)
     df["CircuitAvgPosition"] = df["CircuitAvgPosition"].fillna(overall_avg_position)
+    df["RecentTeammateGap"] = df["RecentTeammateGap"].fillna(0)
+    df["RecentTeamDNFRate"] = df["RecentTeamDNFRate"].fillna(0)
 
     return df
 
+def compute_teammate_gap(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+
+    team_race_positions = df.groupby(["Year", "RoundNumber", "TeamId"])["Position"].transform(
+        lambda x: x.sum()
+    )
+
+    df["TeammateGap"] = df["Position"] - (team_race_positions - df["Position"])
+
+    return df
+
+
+def add_teammate_form_feature(df: pd.DataFrame, window: int = 5) -> pd.DataFrame:
+    df = df.copy()
+    df = df.sort_values(["Year", "RoundNumber"])
+    df = compute_teammate_gap(df)
+
+    df["RecentTeammateGap"] = (
+        df.groupby("DriverId")["TeammateGap"]
+        .transform(lambda x: x.shift(1).rolling(window, min_periods=1).mean())
+    )
+
+    df = df.drop(columns=["TeammateGap"])
+
+    return df
+
+def add_team_reliability_feature(df: pd.DataFrame, window: int = 5) -> pd.DataFrame:
+    df = df.copy()
+    df = df.sort_values(["Year", "RoundNumber"])
+
+    team_round_dnf = (
+        df.groupby(["Year", "RoundNumber", "TeamId"])["Status"]
+        .apply(lambda x: (x == "Retired").mean())
+        .reset_index()
+        .rename(columns={"Status": "TeamRoundDNFRate"})
+    )
+
+    team_round_dnf = team_round_dnf.sort_values(["Year", "RoundNumber"])
+    team_round_dnf["RecentTeamDNFRate"] = (
+        team_round_dnf.groupby("TeamId")["TeamRoundDNFRate"]
+        .transform(lambda x: x.shift(1).rolling(window, min_periods=1).mean())
+    )
+
+    df = df.merge(
+        team_round_dnf[["Year", "RoundNumber", "TeamId", "RecentTeamDNFRate"]],
+        on=["Year", "RoundNumber", "TeamId"],
+        how="left"
+    )
+
+    return df
 
 def finalize_dataset(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
