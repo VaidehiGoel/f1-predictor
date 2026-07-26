@@ -11,6 +11,13 @@ from src.modeling import select_features_and_target
 def build_upcoming_race_row(year: int, round_number: int, event_name: str) -> pd.DataFrame:
     quali_results = get_session_results(year, round_number, "Q", event_name)
     quali_results = pd.DataFrame(quali_results)
+
+    if quali_results.empty:
+        raise ValueError(
+            f"No qualifying data available for {event_name} ({year}, Round {round_number}). "
+            "This likely means qualifying hasn't happened yet, or the race/round doesn't exist."
+        )
+
     quali_results = clean_lap_times(quali_results)
 
     upcoming_race_row = quali_results.copy()
