@@ -49,6 +49,10 @@ model = XGBRanker(
     max_depth=3,
     learning_rate=0.1
 )
+
+X_train = X_train.astype(float)
+X_test = X_test.astype(float)
+
 model.fit(X_train, y_train, group=group_sizes_train)
 
 joblib.dump(model, MODELS_DIR / "xgb_ranker.pkl")
@@ -63,6 +67,8 @@ joblib.dump(fitted_values, MODELS_DIR / "fitted_values.pkl")
 print(f"Fitted values saved to {MODELS_DIR / 'fitted_values.pkl'}")
 
 test_df = test_df.copy()
+X_train = X_train.astype(float)
+X_test = X_test.astype(float)
 test_df["PredictedPosition"] = model.predict(X_test)
 
 evaluate_predictions(test_df)
