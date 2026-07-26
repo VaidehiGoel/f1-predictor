@@ -51,5 +51,12 @@ for year in sorted(train_df["Year"].unique()):
     subset = train_df[train_df["Year"] == year]
     print(year, subset["RoundNumber"].is_monotonic_increasing)
 
+overall_avg_position = race_level_df["Position"].mean()
+race_level_df = fill_missing_form(race_level_df, overall_avg_position)
+
+max_q1 = race_level_df["Q1_seconds"].max()
+max_q2 = race_level_df["Q2_seconds"].max()
+race_level_df = add_qualifying_flags(race_level_df, max_q1, max_q2)
+
 print(X_train[["RecentFormPosition", "RecentFormTeamPosition", "RecentTeammateGap"]].corr())
 print((X_train["TeammateHistoryExists"] == X_train["DriverHasHistory"]).mean())

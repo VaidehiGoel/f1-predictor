@@ -74,14 +74,11 @@ def add_circuit_history_feature(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def add_qualifying_flags(df: pd.DataFrame) -> pd.DataFrame:
+def add_qualifying_flags(df: pd.DataFrame, max_q1: float, max_q2: float) -> pd.DataFrame:
     df = df.copy()
 
     df["ReachedQ2"] = df["Q2_seconds"].notna()
     df["ReachedQ3"] = df["Q3_seconds"].notna()
-
-    max_q1 = df["Q1_seconds"].max()
-    max_q2 = df["Q2_seconds"].max()
 
     df["Q1_seconds"] = df["Q1_seconds"].fillna(max_q1)
     df["Q2_seconds"] = df["Q2_seconds"].fillna(max_q2)
@@ -90,10 +87,8 @@ def add_qualifying_flags(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def fill_missing_form(df: pd.DataFrame) -> pd.DataFrame:
+def fill_missing_form(df: pd.DataFrame, overall_avg_position: float) -> pd.DataFrame:
     df = df.copy()
-
-    overall_avg_position = df["Position"].mean()
 
     df["DriverHasHistory"] = df["RecentFormPosition"].notna()
     df["TeamHasHistory"] = df["RecentFormTeamPosition"].notna()
