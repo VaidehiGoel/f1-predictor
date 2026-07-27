@@ -17,6 +17,8 @@ from src.feature_engineering import (
 from src.predict import predict_race
 from configs.config import SEASONS
 
+from fastapi.middleware.cors import CORSMiddleware
+
 CURRENT_SEASON = 2026
 
 historical_data = {}
@@ -69,8 +71,14 @@ async def lifespan(app: FastAPI):
 
     historical_data.clear()
 
-
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://localhost:5173"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
