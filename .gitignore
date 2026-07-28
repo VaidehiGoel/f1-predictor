@@ -1,10 +1,16 @@
 venv/
 data/cache/
 data/raw/
-data/processed/
-models/*.pkl
-models/*.joblib
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
 .env
+
+# Ignore all processed data except this specific pre-built artifact
+data/processed/*
+!data/processed/featured_historical.csv
+
+# Ignore all model files except these two pre-built artifacts
+models/*
+!models/xgb_ranker.pkl
+!models/fitted_values.pkl
