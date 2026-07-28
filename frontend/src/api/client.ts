@@ -1,6 +1,6 @@
 import type { DriverPrediction, RaceOption } from "../types/prediction";
 
-const API_BASE_URL = "http://127.0.0.1:8000";
+const API_BASE_URL = "https://f1-predictor-eh6n.onrender.com";
 
 export async function getAvailableRaces(): Promise<RaceOption[]> {
   const response = await fetch(`${API_BASE_URL}/races`);
