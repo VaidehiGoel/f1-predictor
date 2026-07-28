@@ -1,1 +1,22 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+@theme {
+  --color-asphalt: #0B0E14;
+  --color-surface: #151A23;
+  --color-surface-light: #1E2530;
+  --color-race-red: #E10600;
+  --color-telemetry-blue: #00D2FF;
+  --color-ink: #F5F6F7;
+  --color-muted: #6B7280;
+
+  --font-display: 'Titillium Web', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+  background-color: var(--color-asphalt);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}

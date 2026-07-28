@@ -23,6 +23,10 @@ def build_upcoming_race_row(year: int, round_number: int, event_name: str) -> pd
     upcoming_race_row = quali_results.copy()
     upcoming_race_row["SessionType"] = "R"
     upcoming_race_row["GridPosition"] = upcoming_race_row["Position"]
+
+    num_drivers = len(upcoming_race_row)
+    upcoming_race_row["GridPosition"] = upcoming_race_row["GridPosition"].fillna(num_drivers)
+
     upcoming_race_row["Position"] = None
     upcoming_race_row["Status"] = None
 
@@ -86,5 +90,5 @@ def predict_race(year: int, round_number: int, event_name: str, featured_histori
 
     prediction_row = prediction_row.sort_values("PredictedScore")
     prediction_row["PredictedRank"] = range(1, len(prediction_row) + 1)
-
+    print(prediction_row.isna().sum())
     return prediction_row

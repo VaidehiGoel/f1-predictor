@@ -105,5 +105,5 @@ def predict(year: int, round_number: int, event_name: str):
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-    output_columns = ["Abbreviation", "FullName", "GridPosition", "PredictedRank"]
+    output_columns = ["Abbreviation", "FullName", "TeamName", "TeamColor", "GridPosition", "PredictedRank"]
     return result[output_columns].to_dict(orient="records")
