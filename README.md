@@ -10,8 +10,8 @@ Not a toy notebook: this is a production-shaped pipeline with leakage prevention
 
 Given a race where qualifying has just completed, GridCast predicts the full finishing order for every driver on the grid — using a gradient-boosted ranking model trained on five seasons (2022–2026) of real F1 data via [FastF1](https://github.com/theOehrly/Fast-F1).
 
-**Live demo:** _[add your deployed URL here]_
-**API docs:** _[add your deployed API `/docs` URL here]_
+**Live demo:** 
+**API docs:** 
 
 ---
 
