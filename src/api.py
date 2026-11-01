@@ -55,7 +55,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "https://f1-predictor-teal.vercel.app","https://gridcast-f1.vercel.app/"],
+    allow_origins=["http://localhost:5173", "https://f1-predictor-teal.vercel.app","https://gridcast-f1.vercel.app"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
